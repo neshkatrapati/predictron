@@ -1,5 +1,5 @@
 import tensorflow as tf
-from . import util
+import util
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer('batch_size', 100, 'Batch size')
@@ -207,10 +207,10 @@ def rollout_states(state, config):
         hidden_states.append(hidden_state)
 
     states = tf.reshape(
-        tf.pack(states[:-1], 1),
+        tf.stack(states[:-1], 1),
         [config.batch_size, config.predictron_depth, state_size(config)])
     hidden_states = tf.reshape(
-        tf.pack(hidden_states, 1),
+        tf.stack(hidden_states, 1),
         [config.batch_size, config.predictron_depth, state_size(config)])
 
     util.activation_summary(states)
@@ -225,6 +225,7 @@ def output_network(inputs, config):
                                     tf.constant_initializer(0.0))
     weights_2 = util.variable_with_weight_decay(
         'weights_2', [config.output_hidden_size, config.reward_size])
+    print(weights_2)
     biases_2 = util.variable_on_cpu('biases_2', [config.reward_size],
                                     tf.constant_initializer(0.0))
 
@@ -283,7 +284,7 @@ def reward_network(hidden_states, config):
             config.batch_size, config.predictron_depth - 1, config.reward_size
         ])
     rewards = tf.concat(
-        concat_dim=1,
+        axis=1,
         values=[tf.zeros([config.batch_size, 1, config.reward_size]), rewards])
 
     util.activation_summary(rewards)
@@ -303,7 +304,7 @@ def discount_network(hidden_states, config):
             config.batch_size, config.predictron_depth - 1, config.reward_size
         ])
     discounts = tf.concat(
-        concat_dim=1,
+        axis=1,
         values=[
             tf.ones([config.batch_size, 1, config.reward_size]), discounts
         ])
@@ -325,7 +326,7 @@ def lambda_network(hidden_states, config):
             config.batch_size, config.predictron_depth - 1, config.reward_size
         ])
     lambdas = tf.concat(
-        concat_dim=1,
+        axis=1,
         values=[lambdas, tf.zeros([config.batch_size, 1, config.reward_size])])
 
     util.activation_summary(lambdas)

@@ -1,0 +1,5 @@
+from maze import MazeGenerator
+g = MazeGenerator(height=4, width=4, density=0.15)
+mazes = g.generate_mazes(1)
+print(mazes[0])
+g.get_trajectory(mazes[0])

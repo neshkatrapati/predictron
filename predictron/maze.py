@@ -1,5 +1,6 @@
 import random
-from .util import Colour
+import numpy
+from util import Colour
 
 
 class MazeGenerator():
@@ -36,6 +37,36 @@ class MazeGenerator():
     not_bottom = int(full_rows + empty_row, base=2)
 
     return not_left, not_right, not_top, not_bottom
+
+  def get_trajectory(self, maze, steps = 7):
+      non_wall_cells = []
+      for i, row in enumerate(maze):
+          cells = [cell[0] for cell in row]
+          non_wall_cells.extend([ i * self.width + j for j,cell in enumerate(cells) if cells[j] == 0])
+
+      random.shuffle(non_wall_cells)
+      position = non_wall_cells[0] // self.width, non_wall_cells[0] % self.width
+      visited = []
+      m = numpy.array(maze)
+      for step in range(steps):
+          print(position)
+          visited.append(position)
+          left = position[0], max(0, position[1] - 1)
+          right = position[0], min(self.width - 1, position[1] + 1)
+          up = max(0, position[0] - 1), position[1]
+          down = min(self.width - 1, position[0] + 1), position[1]
+          positions = [left, right, up, down]
+          random.shuffle(positions)
+          found = False
+          for pos in positions:
+              if pos not in visited and m[pos][0] != 1:
+                  position = pos
+                  found = True
+                  break
+          if not found:
+              break
+
+      return non_wall_cells
 
   def maze_to_binary(self, maze):
     binary = bin(maze)[2:]
