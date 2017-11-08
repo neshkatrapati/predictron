@@ -49,7 +49,6 @@ class MazeGenerator():
       visited = []
       m = numpy.array(maze)
       for step in range(steps):
-          print(position)
           visited.append(position)
           left = position[0], max(0, position[1] - 1)
           right = position[0], min(self.width - 1, position[1] + 1)
@@ -65,8 +64,11 @@ class MazeGenerator():
                   break
           if not found:
               break
-
-      return non_wall_cells
+      
+      trajectory = [0 for i in range(self.width * self.width)]
+      for i,j in visited:
+          trajectory[i*self.width + j] = 1
+      return trajectory
 
   def maze_to_binary(self, maze):
     binary = bin(maze)[2:]

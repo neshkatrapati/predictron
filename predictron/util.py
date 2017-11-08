@@ -34,6 +34,7 @@ def variable_with_weight_decay(name, shape, stddev=1e-3, wd=0.01):
   Returns:
     Variable Tensor
   """
+  
   var = variable_on_cpu(
       name,
       shape,

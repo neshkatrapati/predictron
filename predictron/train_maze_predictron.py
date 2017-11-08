@@ -44,7 +44,7 @@ def train():
 
     preturns, lambda_preturn = predictron.predictron(mazes, FLAGS)
 
-    print(preturns, lambda_preturn)
+
 
     total_loss, consistency_loss = predictron.loss(preturns, lambda_preturn,
                                                    labels)
@@ -58,6 +58,7 @@ def train():
         config=tf.ConfigProto(
             log_device_placement=FLAGS.log_device_placement)) as mon_sess:
 
+
       step = 0
       while not mon_sess.should_stop():
         step += 1
@@ -65,18 +66,20 @@ def train():
 
         # Supervised learning
 #        _mazes, _labels = generator.generate_labelled_mazes(FLAGS.batch_size)
-        _mazes, = generator.generate_mazes(FLAGS.batch_size)
+        _mazes = generator.generate_mazes(FLAGS.batch_size)
         _labels = [generator.get_trajectory(m) for m in _mazes]
+
         feed_dict = {mazes: _mazes, labels: _labels}
         loss_value, _ = mon_sess.run([total_loss, train_op], feed_dict)
+
         check_nan(loss_value)
 
-        # Semi-supervised learning
-      #  for _ in range(FLAGS.consistency_updates):
-      #    _mazes = generator.generate_mazes(FLAGS.batch_size)
-      #    consistency_loss_value, _ = mon_sess.run(
-      #        [consistency_loss, semi_supervised_train], {mazes: _mazes})
-      #    check_nan(consistency_loss_value)
+    #    Semi-supervised learning
+        for _ in range(FLAGS.consistency_updates):
+         _mazes = generator.generate_mazes(FLAGS.batch_size)
+         consistency_loss_value, _ = mon_sess.run(
+             [consistency_loss, semi_supervised_train], {mazes: _mazes})
+         check_nan(consistency_loss_value)
 
         log_step(step, start_time, loss_value)
 

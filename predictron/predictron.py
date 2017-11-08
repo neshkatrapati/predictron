@@ -45,6 +45,7 @@ def loss(preturns, lambda_preturn, labels):
 
     total_loss = preturns_loss + lambda_preturn_loss + consistency_loss
     consistency_loss += l2_loss
+    tf.summary.scalar('total_curve', total_loss)
     return total_loss, consistency_loss
 
 
